@@ -5,7 +5,6 @@ import (
 	"crypto/tls"
 	"fmt"
 	"io"
-	"math"
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
