@@ -26,10 +26,6 @@ jobs:
           - goos: android
             goarch: arm64
             output: openhcc-android-termux-adb-arm64
-          - goos: android
-            goarch: arm
-            output: openhcc-android-termux-adb-arm
-
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
