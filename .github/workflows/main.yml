@@ -1,0 +1,54 @@
+name: Build OpenHCC Multi-Platform
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch: # Allows manual triggering
+
+jobs:
+  build:
+    name: Build Binaries
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          # Windows
+          - goos: windows
+            goarch: amd64
+            output: openhcc-windows-amd64.exe
+          # Linux
+          - goos: linux
+            goarch: amd64
+            output: openhcc-linux-amd64
+          # Android (Note: These are CLI binaries for Termux/ADB, not .apk files)
+          - goos: android
+            goarch: arm64
+            output: openhcc-android-termux-adb-arm64
+          - goos: android
+            goarch: arm
+            output: openhcc-android-termux-adb-arm
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+
+      - name: Build Binary
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+          CGO_ENABLED: 0 # Ensures portable binaries without library dependencies
+        run: |
+          go build -ldflags="-s -w" -o build/${{ matrix.output }} main.go
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.output }}
+          path: build/${{ matrix.output }}
